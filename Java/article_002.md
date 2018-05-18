@@ -65,7 +65,6 @@ JNIEXPORT void JNICALL Java_HelloWorld_displayHelloWorld
 （这里我们可以这样理解：这个h文件相当于我们在java里面的接口，这里声明了一个Java_HelloWorld_displayHelloWorld (JNIEnv *, jobject);方法，然后在我们的本地方法里面实现这个方法，也就是说我们在编写C/C++程序的时候所使用的方法名必须和这里的一致）。
 
 4. 编写本地方法
-
 实现和由javah命令生成的头文件里面声明的方法名相同的方法。
 代码2：
 
