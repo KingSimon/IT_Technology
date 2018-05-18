@@ -94,7 +94,7 @@ JNI（Java Native Interface）调用中考虑的问题
 
 在首次使用JNI的时候有些疑问，后来在使用中一一解决，下面就是这些问题的备忘：
 
-1. java和c是如何互通的？
+### 1. java和c是如何互通的？
       其实不能互通的原因主要是数据类型的问题，jni解决了这个问题，例如那个c文件中的jstring数据类型就是java传入的String对象 ，经过jni函数的转化就能成为c的char*。
       对应数据类型关系如下表：
         Java 类型 本地c类型 说明
@@ -108,16 +108,16 @@ JNI（Java Native Interface）调用中考虑的问题
         double jdouble 64 位
         void void N/A
 
-2. 如何将java传入的String参数转换为c的char*，然后使用?
+### 2. 如何将java传入的String参数转换为c的char*，然后使用?
 java 传入的String参数，在c文件中被jni转换为jstring的数据类型，在c文件中声明char* test，然后test = (char*)(*env)->GetStringUTFChars(env, jstring, NULL);注意：test使用完后，通知虚拟机平台相关代码无需再访问：(*env)->ReleaseStringUTFChars(env, jstring, test);
 
-3. 将c中获取的一个char*的buffer传递给java？
+### 3. 将c中获取的一个char*的buffer传递给java？
 这个char*如果是一般的字符串的话，作为string传回去就可以了。如果是含有’/0’的buffer，最好作为bytearray传出，因为可以制定copy的length，如果copy到string，可能到’/0’就截断了。
 
 有两种方式传递得到的数据：
 
-*  一种是在jni中直接new一个byte数组，然后调用函数(*env)->SetByteArrayRegion(env, bytearray, 0, len, buffer);将buffer的值copy到bytearray中，函数直接return bytearray就可以了。
-* 一种是return错误号，数据作为参数传出，但是java的基本数据类型是传值，对象是传递的引用，所以将这个需要传出的byte数组用某个类包一下，如下：
+    *  一种是在jni中直接new一个byte数组，然后调用函数(*env)->SetByteArrayRegion(env, bytearray, 0, len, buffer);将buffer的值copy到bytearray中，函数直接return bytearray就可以了。
+    * 一种是return错误号，数据作为参数传出，但是java的基本数据类型是传值，对象是传递的引用，所以将这个需要传出的byte数组用某个类包一下，如下：
 ```
 class RetObj
 {
@@ -136,5 +136,5 @@ fid = (*env)->GetFieldID(env, cls, "retbytes", "[B"]);
 (*env)->SetObjectField(env, retobj, fid, bytearray);
 ```
 
-4. 不知道占用多少空间的buffer，如何传递出去呢？
+### 4. 不知道占用多少空间的buffer，如何传递出去呢？
  在jni的c文件中new出空间，传递出去。java的数据不初始化，指向传递出去的空间即可。
