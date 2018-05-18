@@ -11,7 +11,7 @@ JNI（Java Native Interface）的书写步骤
 * 使用C/C++（或者其他编程想语言）实现本地方法
 * 将C/C++编写的文件生成动态连接库
 
-1. 编写java程序：
+## 1. 编写java程序：
 这里以HelloWorld为例。
 代码1：
 ```
@@ -31,10 +31,10 @@ class HelloWorld {
 Load 动态库：System.loadLibrary("hello");加载动态库（我们可以这样理解：我们的方法displayHelloWorld()没 有实现，但是我们在下面就直接使用了，所以必须在使用之前对它进行初始化）这里一般是以static块进行加载的。同时需要注意的是 System.loadLibrary();的参数“hello”是动态库的名字。
 main()方法
 
-2. 编译没有什么好说的了
+## 2. 编译没有什么好说的了
 javac HelloWorld.java
 
-3. 生成扩展名为h的头文件
+## 3. 生成扩展名为h的头文件
 javah ?jni HelloWorld
 头文件的内容：
 
@@ -64,7 +64,7 @@ JNIEXPORT void JNICALL Java_HelloWorld_displayHelloWorld
 ```
 （这里我们可以这样理解：这个h文件相当于我们在java里面的接口，这里声明了一个Java_HelloWorld_displayHelloWorld (JNIEnv *, jobject);方法，然后在我们的本地方法里面实现这个方法，也就是说我们在编写C/C++程序的时候所使用的方法名必须和这里的一致）。
 
-4. 编写本地方法
+## 4. 编写本地方法
 实现和由javah命令生成的头文件里面声明的方法名相同的方法。
 代码2：
 
@@ -82,19 +82,19 @@ return;
 
 注 意代码2中的第1行，需要将jni.h（该文件可以在%JAVA_HOME%/include文件夹下面找到）文件引入，因为在程序中的JNIEnv、 jobject等类型都 是在该头文件中定义的；另外在第2行需要将HelloWorld.h头文件引入（我是这么理解的：相当于我们在编写java程序的时候，实现一个接口的话 需要声明才可以，这里就是将HelloWorld.h头文件里面声明的方法加以实现。当然不一定是这样）。然后保存为HelloWorldImpl.c就 ok了。
 
-5. 生成动态库
+## 5. 生成动态库
 这里以在Windows中为例，需要生成dll文件。在保存HelloWorldImpl.c文件夹下面，使用VC的编译器cl成。
 cl -I%java_home%/include -I%java_home%/include/win32 -LD HelloWorldImp.c -Fehello.dll
 注 意：生成的dll文件名在选项-Fe后面配置，这里是hello，因为在HelloWorld.java文件中我们loadLibary的时候使用的名字 是hello。当然这里修改之后那里也需要修改。另外需要将-I%java_home%/include -I%java_home%/include/win32参数加上，因为在第四步里面编写本地方法的时候引入了jni.h文件。
 
-6. 运行程序
+## 6. 运行程序
 java HelloWorld就ok。
 
 JNI（Java Native Interface）调用中考虑的问题
 
 在首次使用JNI的时候有些疑问，后来在使用中一一解决，下面就是这些问题的备忘：
 
-1) java和c是如何互通的？
+1. java和c是如何互通的？
       其实不能互通的原因主要是数据类型的问题，jni解决了这个问题，例如那个c文件中的jstring数据类型就是java传入的String对象 ，经过jni函数的转化就能成为c的char*。
       对应数据类型关系如下表：
         Java 类型 本地c类型 说明
@@ -108,10 +108,10 @@ JNI（Java Native Interface）调用中考虑的问题
         double jdouble 64 位
         void void N/A
 
-2) 如何将java传入的String参数转换为c的char*，然后使用?
+2. 如何将java传入的String参数转换为c的char*，然后使用?
 java 传入的String参数，在c文件中被jni转换为jstring的数据类型，在c文件中声明char* test，然后test = (char*)(*env)->GetStringUTFChars(env, jstring, NULL);注意：test使用完后，通知虚拟机平台相关代码无需再访问：(*env)->ReleaseStringUTFChars(env, jstring, test);
 
-3) 将c中获取的一个char*的buffer传递给java？
+3. 将c中获取的一个char*的buffer传递给java？
 这个char*如果是一般的字符串的话，作为string传回去就可以了。如果是含有’/0’的buffer，最好作为bytearray传出，因为可以制定copy的length，如果copy到string，可能到’/0’就截断了。
 
 有两种方式传递得到的数据：
@@ -136,5 +136,5 @@ fid = (*env)->GetFieldID(env, cls, "retbytes", "[B"]);
 (*env)->SetObjectField(env, retobj, fid, bytearray);
 ```
 
-4) 不知道占用多少空间的buffer，如何传递出去呢？
+4. 不知道占用多少空间的buffer，如何传递出去呢？
  在jni的c文件中new出空间，传递出去。java的数据不初始化，指向传递出去的空间即可。
