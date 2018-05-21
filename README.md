@@ -5,6 +5,7 @@
 ---
  - [ActionScript](ActionScript/toc.md)
  - [AIR for Android](AIR_for_Android/toc.md)
+ - [Android](Android/toc.md)
  - [ASP.NET](ASP.NET/toc.md)
  - [C#](C%23/toc.md)
  - [CSS](CSS/toc.md)
