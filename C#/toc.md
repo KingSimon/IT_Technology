@@ -9,4 +9,7 @@
  - [C# 中的加框与去框(装箱与拆箱)](article_007.md)
  - [C#中的类属性](article_008.md)
  - [C#中的内存管理](article_009.md)
+
+ - [C#设计模式](设计模式/toc.md)
+
  - [返回](../README.md)
